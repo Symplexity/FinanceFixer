@@ -45,3 +45,4 @@ class Events(Enum):
     EDIT_LOAN = "edit_loan"
     SHOW_MESSAGE = "show_message"
     REFRESH_LOANS = "refresh_loans"
+    SIM_OPTIONS_CHANGED = "sim_options_changed"

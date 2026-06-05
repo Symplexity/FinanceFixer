@@ -1,8 +1,8 @@
 from financefixer.data.loanRepo import LoanRepo
 from financefixer.application.loanApplication import LoanActions
 
+from financefixer.ui.interfaces.interfaces import ILoanAppView
 from financefixer.ui.loanAppPresenter import LoanAppPresenter
-from financefixer.ui.loanAppViewBase import LoanAppViewBase
 
 from financefixer.utils.eventBus import EventBus
 
@@ -12,7 +12,7 @@ class FinanceFixerApp:
         self.loan_repo = LoanRepo()
         self.event_bus = EventBus()
         self.loan_actions = LoanActions(self.loan_repo)
-        self.view: LoanAppViewBase | None = None
+        self.view: ILoanAppView | None = None
 
     def _run(self):
         if self.view is None:

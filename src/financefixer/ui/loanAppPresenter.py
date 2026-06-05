@@ -1,11 +1,14 @@
 from financefixer.domain.models.loan import Loan
 from financefixer.application.loanApplication import LoanActions
 
+from financefixer.ui.interfaces.interfaces import ILoanAppView
 from financefixer.utils.eventBus import EventBus, Events
 
 
 class LoanAppPresenter:
-    def __init__(self, view, event_bus: EventBus, loan_actions: LoanActions):
+    def __init__(
+        self, view: ILoanAppView, event_bus: EventBus, loan_actions: LoanActions
+    ):
         self.view = view
         self.event_bus = event_bus
         self.loan_actions = loan_actions
