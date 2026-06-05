@@ -20,9 +20,9 @@ class LoanAppView(LoanAppViewBase):
 
     def bind_add_loan(self, callback):
         super().bind_add_loan(callback)
-        self.widget.add_loan_button.clicked.connect(self.on_add_loan)
+        self.widget.add_loan_button.clicked.connect(self.handle_add_loan)
 
-    def on_add_loan(self):
+    def handle_add_loan(self):
         if self.add_loan_callback:
             name = self.widget.name_input.text()
             principal = int(
@@ -44,9 +44,9 @@ class LoanAppView(LoanAppViewBase):
 
     def bind_get_loan(self, callback):
         super().bind_get_loan(callback)
-        self.widget.get_loan_button.clicked.connect(self.on_get_loan)
+        self.widget.get_loan_button.clicked.connect(self.handle_get_loan)
 
-    def on_get_loan(self):
+    def handle_get_loan(self):
         if self.get_loan_callback:
             loan_id = self.widget.get_loan_id_input.value()
             self.get_loan_callback(loan_id)
@@ -56,10 +56,10 @@ class LoanAppView(LoanAppViewBase):
     def refresh_loans(self):
         pass
 
-    def on_edit_loan(self, loan: Loan):
+    def handle_edit_loan(self, loan: Loan):
         pass
 
-    def on_delete_loan(self, loan_id: int):
+    def handle_delete_loan(self, loan_id: int):
         pass
 
     def show_message(self, message: str):

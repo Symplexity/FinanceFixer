@@ -2,11 +2,14 @@ import tkinter as tk
 from tkinter import ttk
 
 from financefixer.domain.models.loan import Loan
+from financefixer.utils.eventBus import EventBus, Events
 
 
 class LoanInputFrame(ttk.LabelFrame):
-    def __init__(self, parent, **kwargs):
+    def __init__(self, bus: EventBus, parent, **kwargs):
         super().__init__(parent, **kwargs)
+
+        self.event_bus = bus
 
         self.name_var = tk.StringVar()
         self.amount_var = tk.DoubleVar()
@@ -23,7 +26,9 @@ class LoanInputFrame(ttk.LabelFrame):
         ttk.Entry(self, textvariable=self.interest_var).grid(row=2, column=1)
         ttk.Entry(self, textvariable=self.min_payment_var).grid(row=3, column=1)
 
-        self.add_button = ttk.Button(self, text="Add Loan")
+        self.add_button = ttk.Button(
+            self, text="Add Loan", command=self.handle_add_loan
+        )
         self.add_button.grid(row=4, column=0, columnspan=2, pady=5)
 
     def get_inputs(self) -> Loan:
@@ -34,13 +39,17 @@ class LoanInputFrame(ttk.LabelFrame):
             min_payment_cents=int(self.min_payment_var.get() * 100),
         )
 
-    def bind_add_loan(self, callback):
-        self.add_button.config(command=callback)
+    def handle_add_loan(self):
+        input = self.get_inputs()
+        self.event_bus.publish(Events.ADD_LOAN, loan=input)
 
 
 class LoanDisplayFrame(ttk.LabelFrame):
-    def __init__(self, parent, **kwargs):
+    def __init__(self, bus: EventBus, parent, **kwargs):
         super().__init__(parent, **kwargs)
+
+        self.event_bus = bus
+        self.event_bus.subscribe(Events.REFRESH_LOANS, self.refresh_loans)
 
         ttk.Label(self, text="Added Loans:").pack(anchor="w")
 
@@ -72,11 +81,15 @@ class LoanDisplayFrame(ttk.LabelFrame):
         button_container = ttk.Frame(self)
         button_container.pack(fill=tk.X, pady=5)
 
-        self.delete_button = ttk.Button(button_container, text="Delete Selected")
+        self.delete_button = ttk.Button(
+            button_container, text="Delete Selected", command=self.handle_delete_loan
+        )
         self.delete_button.grid(row=0, column=0, padx=5, pady=5)
 
-        self.update_button = ttk.Button(button_container, text="Update Selected")
-        self.update_button.grid(row=0, column=1, padx=5, pady=5)
+        self.edit_button = ttk.Button(
+            button_container, text="Edit Selected", command=self.handle_edit_loan
+        )
+        self.edit_button.grid(row=0, column=1, padx=5, pady=5)
 
     def refresh_loans(self, loans: list[Loan]):
         self.loan_table.delete(*self.loan_table.get_children())
@@ -99,8 +112,8 @@ class LoanDisplayFrame(ttk.LabelFrame):
         selected = self.loan_table.selection()
         return [int(item) for item in selected]
 
-    def bind_delete_loan(self, callback):
-        self.delete_button.config(command=callback)
+    def handle_delete_loan(self):
+        self.event_bus.publish(Events.DELETE_LOAN, loan_ids=self.get_selected())
 
-    def bind_edit_loan(self, callback):
-        self.update_button.config(command=callback)
+    def handle_edit_loan(self):
+        self.event_bus.publish(Events.EDIT_LOAN, loan_id=self.get_selected())
